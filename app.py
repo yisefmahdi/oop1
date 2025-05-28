@@ -237,22 +237,64 @@ def upload_file():
 
 
 def generate_response(relevant_text, question, question_type, selectedModel, selectedCompany, chat_id, chat_type, max_tokens, files=None, file_type=None, file_name=None):
-    prompt = f" انت خبير اكاديمي اقرأ الكتاب التالي وأجب فقط باستخدام المعلومات من الكتاب :\n\n{relevant_text}\n\nالسؤال: {question}"
+    # prompt = f" انت خبير اكاديمي اقرأ الكتاب التالي وأجب فقط باستخدام المعلومات من الكتاب :\n\n{relevant_text}\n\nالسؤال: {question}"
+    # if chat_type != "chat":
+    #     if question_type == "boolean":
+    #         prompt += "\n\nأجب بـ 'صحيح' أو 'خطأ' بناءً على الكتاب واذكر سبب اختيار الاجابة من الكتاب ."
+    #     elif question_type == "short_answer":
+    #         prompt += "\n\nأجب بإجابة تستند إلى المعلومات الكتاب."
+    #     elif question_type == "multiple_choice":
+    #         prompt += "\n\n اختر الإجابة الصحيحة واذكر سبب اختيار الاجابة من الكتاب ."
+    #     elif question_type == "term":
+    #         prompt += "\n\n الجب على المصطلح الاتي"
+    #     elif question_type == "ai":
+    #         prompt = f"\n\n: \n\n{relevant_text}\n\nالسؤال: {question} \n\nأنت خبير أكاديمي. استخدم الذكاء الاصطناعي الخاص بك لحل السؤال."
+    #     elif question_type == "scientific_problem":
+    #         prompt += "\n\n أجب على المسألة العلمية التالية استنادًا إلى الكتاب المعطى."
+    # else:
+    #     prompt = question
+
+    prompt = f"""أنت خبير أكاديمي محترف. اقرأ النص التالي من الكتاب بعناية، كلمة بكلمة، وحلل المعاني بدقة.
+
+        مهمتك هي الإجابة على السؤال التالي بالاعتماد فقط على المعلومات المذكورة في النص، أو ما يمكن استنتاجه بشكل منطقي باستخدام:
+        - قوانين، أو علاقات، أو تعاريف وردت في الكتاب (ولو دون أمثلة).
+        - شرح أو تفسيرات يمكن من خلالها بناء منطق واضح للوصول إلى الجواب.
+
+        لا تعتمد على أي معرفة خارجية لم تُذكر أو تُستنتج من النص.
+
+        إذا لم تتمكن من إيجاد إجابة مباشرة أو استنتاج منطقي واضح بعد التحليل الكامل للنص، اذكر بوضوح:
+        "الإجابة غير موجودة في الكتاب، يُفضل استخدام خيار الذكاء الاصطناعي (AI) لحل هذا السؤال."
+
+        النص من الكتاب:
+        {relevant_text}
+
+        السؤال:
+        {question}
+        """
+
     if chat_type != "chat":
         if question_type == "boolean":
-            prompt += "\n\nأجب بـ 'صحيح' أو 'خطأ' بناءً على الكتاب واذكر سبب اختيار الاجابة من الكتاب ."
+            prompt += "\n\nأجب بـ 'صحيح' أو 'خطأ' فقط، واشرح السبب من النص أو ما يمكن استنتاجه منه."
         elif question_type == "short_answer":
-            prompt += "\n\nأجب بإجابة تستند إلى المعلومات الكتاب."
+            prompt += "\n\nأجب بإجابة دقيقة مستندة إلى النص أو إلى تحليل منطقي منه."
         elif question_type == "multiple_choice":
-            prompt += "\n\n اختر الإجابة الصحيحة واذكر سبب اختيار الاجابة من الكتاب ."
+            prompt += "\n\nاختر الإجابة الصحيحة بناءً على النص أو تحليل مبني عليه، ووضح السبب."
         elif question_type == "term":
-            prompt += "\n\n الجب على المصطلح الاتي"
+            prompt += "\n\nاشرح المصطلح التالي كما ورد أو كما يمكن فهمه من السياق الموجود في النص."
         elif question_type == "ai":
-            prompt = f"\n\n: \n\n{relevant_text}\n\nالسؤال: {question} \n\nأنت خبير أكاديمي. استخدم الذكاء الاصطناعي الخاص بك لحل السؤال."
+            prompt = f"""{relevant_text}
+
+    السؤال: {question}
+
+    أنت خبير أكاديمي. استخدم معرفتك العامة والذكاء الاصطناعي للإجابة عن السؤال بحرية، لأن المعلومات الكاملة قد لا تكون متوفرة في النص."""
         elif question_type == "scientific_problem":
-            prompt += "\n\n أجب على المسألة العلمية التالية استنادًا إلى الكتاب المعطى."
+            prompt += "\n\nحلّ المسألة اعتمادًا على القوانين أو العلاقات أو الأمثلة الواردة في النص، أو استنتاج منطقي منها."
     else:
         prompt = question
+
+
+
+
 
     response = ""
     """
@@ -816,6 +858,5 @@ def extract_text_from_code(file_path):
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',port=5002)
-
 
 
